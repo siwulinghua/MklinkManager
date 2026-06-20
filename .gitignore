@@ -1,0 +1,41 @@
+# 虚拟环境
+venv/
+.venv/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+
+# Nuitka 编译产物
+build/
+*.dist/
+*.build/
+*.onefile-build/
+
+# 编译产物中的二进制文件（避免意外提交）
+*.exe
+*.dll
+*.pyd
+
+# 发布包
+dist/
+*.zip
+
+# 历史快照（仅本地保留）
+archive/
+
+# 构建脚本（含证书信息，不公开）
+build.ps1
+
+# 开发设计文档（仅本地保留）
+docs/
+
+# 系统
+.DS_Store
+Thumbs.db
+Desktop.ini
