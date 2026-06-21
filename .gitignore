@@ -29,6 +29,9 @@ dist/
 # 历史快照（仅本地保留）
 archive/
 
+# 用户运行记录（仅本地保留）
+history.json
+
 # 构建脚本（含证书信息，不公开）
 build.ps1
 

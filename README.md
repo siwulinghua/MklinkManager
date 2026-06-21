@@ -63,7 +63,7 @@ Get-FileHash .\MklinkManager.exe -Algorithm SHA256 | Format-List
 **应与以下值完全一致：**
 
 ```
-SHA-256: aca43cd54ca4baabaf253907e3ed69d0eee65ef6bd0384fe9f45a27d7188331a
+SHA-256: d03379bc02e1d92395690dc0e1517ce627f0647383b325e26aa047698dfa9a62
 ```
 
 > ✅ 哈希匹配 = 文件完整未被篡改 | ❌ 哈希不匹配 = 请勿运行，立即删除

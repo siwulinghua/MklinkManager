@@ -55,11 +55,29 @@ def is_admin() -> bool:
         return False
 
 
+def get_exe_dir() -> str:
+    """获取 exe/脚本 所在目录（兼容 Nuitka / PyInstaller / 开发模式）"""
+    if '__compiled__' in globals():
+        # Nuitka: onefile → NUITKA_ONEFILE_DIRECTORY, standalone → sys.argv[0]
+        return os.environ.get('NUITKA_ONEFILE_DIRECTORY', '') or \
+            os.path.dirname(os.path.abspath(sys.argv[0]))
+    if getattr(sys, 'frozen', False):
+        # PyInstaller / cx_Freeze
+        return os.path.dirname(os.path.abspath(sys.executable))
+    # 开发模式
+    return os.path.dirname(os.path.abspath(__file__))
+
+
 def run_as_admin():
     """以管理员权限重新启动程序"""
-    ctypes.windll.shell32.ShellExecuteW(
-        None, "runas", sys.executable, __file__, None, 1
-    )
+    if '__compiled__' in globals():
+        # Nuitka 编译模式：找到原始 exe 路径重新启动
+        exe_path = os.path.join(get_exe_dir(), os.path.basename(sys.argv[0]))
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", exe_path, None, None, 1)
+    else:
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", sys.executable, __file__, None, 1
+        )
 
 
 def build_mklink_command(mode: str, link_type: str, link_path: str, target_path: str) -> str:
@@ -140,13 +158,9 @@ class MklinkApp(ctk.CTk):
         self.history: list[str] = []
         self._log_info: dict = {}                       # 当前操作的记录信息，成功后写入日志文件
         self._selected_history_index: int | None = None  # 当前选中的历史记录行索引
-        # 优先放在可执行文件旁边（PyInstaller 打包后 sys.executable 是 .exe 路径，开发时 __file__ 是 .py 路径）
-        import sys as _sys
-        if getattr(_sys, 'frozen', False):
-            _base_dir = os.path.dirname(_sys.executable)
-        else:
-            _base_dir = os.path.dirname(os.path.abspath(__file__))
-        self.history_file = os.path.join(_base_dir, "history.json")
+        # 优先放在可执行文件旁边（兼容 Nuitka / PyInstaller / 开发模式）
+        # Nuitka onefile: sys.frozen 为 False，必须用环境变量获取真实 exe 目录 → 见 get_exe_dir()
+        self.history_file = os.path.join(get_exe_dir(), "history.json")
 
         # ---------- 管理员检测 ----------
         self._admin = is_admin()
